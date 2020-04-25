@@ -1,6 +1,8 @@
 import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { ListItem } from "react-native-elements";
 import DraggableFlatList from "react-native-draggable-flatlist";
+import Todo from "./Todo";
 
 const data = [...Array(20)].map((d, index) => ({
   key: `item-${index}`, // For example only -- don't use index as your key!
@@ -8,9 +10,10 @@ const data = [...Array(20)].map((d, index) => ({
   backgroundColor: `rgb(${Math.floor(Math.random() * 255)}, ${
     index * 5
   }, ${132})`,
+  fill: 0,
+  inProgress: false,
+  complete: false,
 }));
-
-class Todo {}
 
 export default class App extends React.Component {
   constructor(props) {
@@ -19,27 +22,7 @@ export default class App extends React.Component {
   }
 
   renderItem = ({ item, index, drag, isActive }) => {
-    return (
-      <TouchableOpacity
-        style={{
-          height: 100,
-          backgroundColor: isActive ? "blue" : item.backgroundColor,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        onLongPress={drag}
-      >
-        <Text
-          style={{
-            fontWeight: "bold",
-            color: "white",
-            fontSize: 32,
-          }}
-        >
-          {item.label}
-        </Text>
-      </TouchableOpacity>
-    );
+    return <Todo todo={item} index={index} drag={drag} isActive={isActive} />;
   };
 
   render() {
@@ -47,7 +30,6 @@ export default class App extends React.Component {
       <View style={styles.container}>
         <View style={styles.header}></View>
         <View style={styles.body}>
-          <Text>Open up App.js to start working on your app!</Text>
           <DraggableFlatList
             data={this.state.data}
             renderItem={this.renderItem}
