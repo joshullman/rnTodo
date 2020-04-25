@@ -7,6 +7,8 @@ import { ListItem } from "react-native-elements";
 import Swipeout from "react-native-swipeout";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 
+import { Feather } from "@expo/vector-icons";
+
 export class Todo {
   constructor({ id, label, backgroundColor }) {
     this.id = id;
@@ -55,19 +57,15 @@ export default class TodoRow extends React.Component {
           {
             text: "Edit",
             backgroundColor: "blue",
-            onPress: (e) => {
-              () => console.log("edit");
-            },
+            onPress: (e) => console.log("edit"),
           },
           {
             text: "Delete",
             backgroundColor: "blue",
-            onPress: (e) => {
-              () => console.log("delete");
-            },
+            onPress: (e) => console.log("delete"),
           },
         ]}
-        // backgroundColor={"blue"}
+        backgroundColor={"blue"}
       >
         <ListItem
           key={index}
@@ -77,23 +75,28 @@ export default class TodoRow extends React.Component {
               backgroundColor: isActive ? "blue" : todo.backgroundColor,
             },
           ]}
-          onPress={this.toggleComplete}
           title={todo.label}
           // subtitle={todo.subtitle}
           leftAvatar={
-            <AnimatedCircularProgress
-              // onPress={this.complete}
-              size={50}
-              width={25}
-              fill={todo.fill}
-              ref={(ref) => (this.circularProgress = ref)}
-              tintColor="#00e0ff"
-              onAnimationComplete={this.complete}
-              backgroundColor="#3d5875"
-            />
+            <TouchableOpacity onPress={this.toggleComplete}>
+              <AnimatedCircularProgress
+                // onPress={this.complete}
+                size={50}
+                width={25}
+                fill={todo.fill}
+                ref={(ref) => (this.circularProgress = ref)}
+                tintColor="#00e0ff"
+                onAnimationComplete={this.complete}
+                backgroundColor="#3d5875"
+              />
+            </TouchableOpacity>
+          }
+          rightAvatar={
+            <TouchableOpacity onLongPress={drag} delayLongPress={0}>
+              <Feather name="list" size={24} color={"blue"} />
+            </TouchableOpacity>
           }
           bottomDivider
-          onLongPress={drag}
         />
       </Swipeout>
     );
