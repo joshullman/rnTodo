@@ -2,23 +2,35 @@ import React from "react";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
 
-import { StyleSheet, Text, TouchableOpacity, Easing } from "react-native";
-import { ListItem } from "react-native-elements";
+import {
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Easing,
+  View,
+} from "react-native";
+import { ListItem, Text } from "react-native-elements";
 import Swipeout from "react-native-swipeout";
+import DoubleClick from "react-native-double-tap";
+
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 
 export class Todo {
   constructor({ id, label, backgroundColor }) {
     this.id = id;
     this.label = label;
     this.backgroundColor = backgroundColor;
-    this.added = Date.now();
+    this.created = Date.now();
   }
+  id;
+  @observable label = "";
   @observable fill = 0;
   @observable inProgress = false;
+  created;
   @observable completed;
+  @observable editing = false;
 }
 
 @observer
@@ -48,6 +60,23 @@ export default class TodoRow extends React.Component {
     }
   };
 
+  onChangeText = (text) => {
+    let { todo } = this.props;
+    todo.label = text;
+  };
+
+  formatDate = (timestamp) => {
+    let date = new Date(timestamp);
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    let year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
+
+  // <TouchableOpacity onPress={() => (todo.editing = true)}>
+
+  // </TouchableOpacity>
+
   render() {
     let { todo, index, drag, isActive } = this.props;
     return (
@@ -57,7 +86,7 @@ export default class TodoRow extends React.Component {
           {
             text: "Edit",
             backgroundColor: "blue",
-            onPress: (e) => console.log("edit"),
+            onPress: (e) => (todo.editing = true),
           },
           {
             text: "Delete",
@@ -70,25 +99,75 @@ export default class TodoRow extends React.Component {
         <ListItem
           key={index}
           style={[
-            styles.container,
+            // styles.container,
             {
               backgroundColor: isActive ? "blue" : todo.backgroundColor,
             },
           ]}
-          title={todo.label}
-          // subtitle={todo.subtitle}
+          title={
+            <View style={{ height: 52, justifyContent: "center" }}>
+              {todo.editing ? (
+                <TextInput
+                  style={{
+                    // borderColor: "gray",
+                    // borderWidth: 1,
+                    paddingVertical: 0,
+                    paddingHorizontal: 0,
+                    paddingTop: 0,
+                  }}
+                  onChangeText={(text) => this.onChangeText(text)}
+                  value={todo.label}
+                  onBlur={() => (todo.editing = false)}
+                  autoFocus
+                  multiline
+                  numberOfLines={3}
+                />
+              ) : (
+                <DoubleClick
+                  doubleTap={() => (todo.editing = true)}
+                  delay={200}
+                >
+                  <Text numberOfLines={3} ellipsizeMode="tail">
+                    {todo.label}
+                  </Text>
+                </DoubleClick>
+              )}
+            </View>
+          }
+          // subtitle={`${this.formatDate(todo.created)}`}
           leftAvatar={
             <TouchableOpacity onPress={this.toggleComplete}>
-              <AnimatedCircularProgress
-                // onPress={this.complete}
-                size={50}
-                width={25}
-                fill={todo.fill}
-                ref={(ref) => (this.circularProgress = ref)}
-                tintColor="#00e0ff"
-                onAnimationComplete={this.complete}
-                backgroundColor="#3d5875"
-              />
+              <View style={{ position: "relative", height: 36, width: 36 }}>
+                <View
+                  style={[
+                    styles.icon,
+                    {
+                      zIndex: 2,
+                    },
+                  ]}
+                >
+                  <AnimatedCircularProgress
+                    // onPress={this.complete}
+                    size={24}
+                    width={12}
+                    fill={todo.fill}
+                    ref={(ref) => (this.circularProgress = ref)}
+                    tintColor="blue"
+                    onAnimationComplete={this.complete}
+                    backgroundColor="#fff"
+                  />
+                </View>
+                <View
+                  style={[
+                    styles.icon,
+                    {
+                      zIndex: 1,
+                    },
+                  ]}
+                >
+                  <FontAwesome name="circle" size={36} color={"blue"} />
+                </View>
+              </View>
             </TouchableOpacity>
           }
           rightAvatar={
@@ -102,27 +181,20 @@ export default class TodoRow extends React.Component {
     );
   }
 }
-{
-  /* <TouchableOpacity
-style={}
-onLongPress={drag}
->
-<Text
-  style={{
-    fontWeight: "bold",
-    color: "white",
-    fontSize: 32,
-  }}
->
-  {item.label}
-</Text>
-</TouchableOpacity> */
-}
 
 const styles = StyleSheet.create({
   container: {
     height: 100,
     alignItems: "center",
     justifyContent: "center",
+  },
+  icon: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 36,
+    width: 36,
   },
 });

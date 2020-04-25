@@ -34,9 +34,6 @@ export default class App extends React.Component {
       <View style={styles.container}>
         <View style={styles.header}></View>
         <View style={styles.body}>
-          <View style={styles.listHeader}>
-            <Text>Incomplete</Text>
-          </View>
           <DraggableFlatList
             data={this.state.data.filter((item) => !item.completed)}
             renderItem={this.renderItem}
