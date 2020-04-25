@@ -31,32 +31,44 @@ export class Todo {
   created;
   @observable completed;
   @observable editing = false;
+  @observable removed;
+
+  updateProp = (prop, val) => {
+    this[prop] = val;
+  };
 }
 
 @observer
 export default class TodoRow extends React.Component {
   toggleComplete = () => {
     let { todo } = this.props;
+    let zero = todo.fill == 0;
     if (todo.inProgress) {
       todo.inProgress = false;
-      this.circularProgress.animate(todo.fill == 0 ? 0 : 100, 10, Easing.quad);
-      todo.fill = 0;
+      if (todo.completed) {
+        this.circularProgress.animate(100, 10, Easing.quad);
+        todo.fill = 100;
+      } else {
+        this.circularProgress.animate(0, 10, Easing.quad);
+        todo.fill = 0;
+      }
     } else {
       todo.inProgress = true;
-      this.circularProgress.animate(
-        todo.fill == 0 ? 100 : 0,
-        2000,
-        Easing.quad
-      );
+      this.circularProgress.animate(zero ? 100 : 0, 2000, Easing.quad);
     }
   };
 
   complete = () => {
     let { todo } = this.props;
     if (todo.inProgress) {
-      todo.completed = Date.now();
+      if (todo.completed) {
+        todo.completed = null;
+        todo.fill = 0;
+      } else {
+        todo.completed = Date.now();
+        todo.fill = 100;
+      }
       todo.inProgress = false;
-      // todo.fill = 100;
     }
   };
 
@@ -84,14 +96,14 @@ export default class TodoRow extends React.Component {
         autoClose
         right={[
           {
-            text: "Edit",
+            text: <FontAwesome name="edit" size={24} color={"white"} />,
             backgroundColor: "blue",
-            onPress: (e) => (todo.editing = true),
+            onPress: (e) => todo.updateProp("editing", true),
           },
           {
-            text: "Delete",
+            text: <FontAwesome name="trash" size={24} color={"white"} />,
             backgroundColor: "blue",
-            onPress: (e) => console.log("delete"),
+            onPress: (e) => todo.updateProp("removed", true),
           },
         ]}
         backgroundColor={"blue"}
@@ -134,7 +146,9 @@ export default class TodoRow extends React.Component {
               )}
             </View>
           }
-          // subtitle={`${this.formatDate(todo.created)}`}
+          subtitle={
+            todo.completed && `Completed ${this.formatDate(todo.completed)}`
+          }
           leftAvatar={
             <TouchableOpacity onPress={this.toggleComplete}>
               <View style={{ position: "relative", height: 36, width: 36 }}>
