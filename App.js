@@ -1,20 +1,22 @@
 import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { ListItem } from "react-native-elements";
+import { observer } from "mobx-react";
+
 import DraggableFlatList from "react-native-draggable-flatlist";
-import Todo from "./Todo";
+import TodoRow, { Todo } from "./Todo";
 
-const data = [...Array(20)].map((d, index) => ({
-  key: `item-${index}`, // For example only -- don't use index as your key!
-  label: index,
-  backgroundColor: `rgb(${Math.floor(Math.random() * 255)}, ${
-    index * 5
-  }, ${132})`,
-  fill: 0,
-  inProgress: false,
-  complete: false,
-}));
-
+const data = [...Array(20)].map(
+  (d, index) =>
+    new Todo({
+      id: `item-${index}`, // For example only -- don't use index as your key!
+      label: index,
+      backgroundColor: `rgb(${Math.floor(Math.random() * 255)}, ${
+        index * 5
+      }, ${132})`,
+    })
+);
+@observer
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -22,7 +24,9 @@ export default class App extends React.Component {
   }
 
   renderItem = ({ item, index, drag, isActive }) => {
-    return <Todo todo={item} index={index} drag={drag} isActive={isActive} />;
+    return (
+      <TodoRow todo={item} index={index} drag={drag} isActive={isActive} />
+    );
   };
 
   render() {
@@ -30,12 +34,24 @@ export default class App extends React.Component {
       <View style={styles.container}>
         <View style={styles.header}></View>
         <View style={styles.body}>
+          <View style={styles.listHeader}>
+            <Text>Incomplete</Text>
+          </View>
           <DraggableFlatList
-            data={this.state.data}
+            data={this.state.data.filter((item) => !item.completed)}
             renderItem={this.renderItem}
-            keyExtractor={(item, index) => `draggable-item-${item.key}`}
+            keyExtractor={(item, index) => `draggable-item-${item.id}`}
             onDragEnd={({ data }) => this.setState({ data })}
           />
+          {/* <View style={styles.listHeader}>
+            <Text>Complete</Text>
+          </View>
+          <DraggableFlatList
+            data={this.state.data.filter((item) => item.completed)}
+            renderItem={this.renderItem}
+            keyExtractor={(item, index) => `draggable-item-${item.id}`}
+            onDragEnd={({ data }) => this.setState({ data })}
+          /> */}
         </View>
       </View>
     );
