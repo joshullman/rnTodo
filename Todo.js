@@ -40,7 +40,7 @@ export class Todo {
 
 @observer
 export default class TodoRow extends React.Component {
-  toggleComplete = () => {
+  startAnimation = () => {
     let { todo } = this.props;
     let zero = todo.fill == 0;
     if (todo.inProgress) {
@@ -59,16 +59,10 @@ export default class TodoRow extends React.Component {
   };
 
   complete = () => {
-    let { todo } = this.props;
+    let { todo, toggleComplete, index } = this.props;
+    console.log("animation complete");
     if (todo.inProgress) {
-      if (todo.completed) {
-        todo.completed = null;
-        todo.fill = 0;
-      } else {
-        todo.completed = Date.now();
-        todo.fill = 100;
-      }
-      todo.inProgress = false;
+      toggleComplete(todo, index);
     }
   };
 
@@ -146,11 +140,13 @@ export default class TodoRow extends React.Component {
               )}
             </View>
           }
-          subtitle={
-            todo.completed && `Completed ${this.formatDate(todo.completed)}`
-          }
+          // subtitle={
+          //   todo.completed
+          //     ? `Completed ${this.formatDate(todo.completed)}`
+          //     : `Created ${this.formatDate(todo.created)}`
+          // }
           leftAvatar={
-            <TouchableOpacity onPress={this.toggleComplete}>
+            <TouchableOpacity onPress={this.startAnimation}>
               <View style={{ position: "relative", height: 36, width: 36 }}>
                 <View
                   style={[
@@ -165,6 +161,8 @@ export default class TodoRow extends React.Component {
                     size={24}
                     width={12}
                     fill={todo.fill}
+                    prefill={todo.fill}
+                    rotation={0}
                     ref={(ref) => (this.circularProgress = ref)}
                     tintColor="blue"
                     onAnimationComplete={this.complete}

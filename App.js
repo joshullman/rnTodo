@@ -8,56 +8,77 @@ import { observer } from "mobx-react";
 import DraggableFlatList from "react-native-draggable-flatlist";
 import TodoRow, { Todo } from "./Todo";
 
-class AppState {
-  @observable list = new Map();
+class TodoList {
+  @observable complete = [];
+  @observable incomplete = [];
+  @observable removed = [];
   @observable viewing = "incomplete";
 
   nowViewing = (page) => {
     this.viewing = page;
   };
+
   init = () => {
-    [...Array(20)].forEach((d, index) =>
-      this.list.set(
-        `item-${index}`,
+    [...Array(7)].forEach((d, index) =>
+      this.incomplete.push(
         new Todo({
-          id: `item-${index}`, // For example only -- don't use index as your key!
-          label: index,
+          id: `item-${index}`, // For example only
+          label: `${index}`,
         })
       )
     );
   };
-  @computed get keys() {
-    return Array.from(this.list.keys());
-  }
-  @computed get full() {
-    return this.keys.map((todoId) => this.list.get(todoId));
-  }
-  @computed get valid() {
-    return this.full.filter((todo) => !todo.removed);
-  }
-  @computed get complete() {
-    return this.valid.filter((todo) => todo.completed);
-  }
-  @computed get incomplete() {
-    return this.valid.filter((todo) => !todo.completed);
-  }
+
+  toggleComplete = (todo) => {
+    todo.inProgress = false;
+    if (todo.completed) {
+      todo.completed = null;
+      todo.fill = 0;
+      this.incomplete.push(todo);
+      let i = this.complete.indexOf(todo);
+      this.complete.splice(i, 1);
+    } else {
+      todo.completed = Date.now();
+      todo.fill = 100;
+      this.complete.push(todo);
+      let i = this.incomplete.indexOf(todo);
+      this.incomplete.splice(i, 1);
+    }
+  };
+
+  removeTodo = (todo) => {
+    if (this.viewing == "complete") {
+      this.removed.push(todo);
+    } else {
+      this.removed.push(todo);
+    }
+  };
 }
 @observer
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = new AppState();
+    this.state = new TodoList();
     this.state.init();
   }
 
   renderItem = ({ item, index, drag, isActive }) => {
+    let { toggleComplete, removeTodo } = this.state;
     return (
-      <TodoRow todo={item} index={index} drag={drag} isActive={isActive} />
+      <TodoRow
+        todo={item}
+        index={index}
+        drag={drag}
+        isActive={isActive}
+        toggleComplete={toggleComplete}
+        removeTodo={removeTodo}
+      />
     );
   };
 
   render() {
-    let { viewing } = this.state;
+    let { viewing, complete, incomplete } = this.state;
+    let todos = viewing == "complete" ? complete : incomplete;
     return (
       <View style={styles.container}>
         <View style={styles.header}></View>
@@ -78,25 +99,21 @@ export default class App extends React.Component {
               />
             </View>
           </View>
+          {todos.length === 0 && (
+            <View>
+              <Text style={{ padding: 10 }}>
+                {viewing == "complete"
+                  ? "Complete a todo to see it here!"
+                  : "Create a todo by clicking the plus sign"}
+              </Text>
+            </View>
+          )}
           <DraggableFlatList
-            data={
-              viewing == "complete"
-                ? this.state.complete
-                : this.state.incomplete
-            }
+            data={this.state[viewing]}
             renderItem={this.renderItem}
             keyExtractor={(item, index) => `draggable-item-${item.id}`}
-            onDragEnd={({ data }) => this.setState({ data })}
+            onDragEnd={({ data }) => (this.state[viewing] = data)}
           />
-          {/* <View style={styles.listHeader}>
-            <Text>Complete</Text>
-          </View>
-          <DraggableFlatList
-            data={this.state.data.filter((item) => item.completed)}
-            renderItem={this.renderItem}
-            keyExtractor={(item, index) => `draggable-item-${item.id}`}
-            onDragEnd={({ data }) => this.setState({ data })}
-          /> */}
         </View>
       </View>
     );
