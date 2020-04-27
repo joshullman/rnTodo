@@ -9,6 +9,7 @@ import {
   Easing,
   View,
 } from "react-native";
+
 import { ListItem, Text } from "react-native-elements";
 import Swipeout from "react-native-swipeout";
 import DoubleClick from "react-native-double-tap";
@@ -60,7 +61,6 @@ export default class TodoRow extends React.Component {
 
   complete = () => {
     let { todo, toggleComplete, index } = this.props;
-    console.log("animation complete");
     if (todo.inProgress) {
       toggleComplete(todo, index);
     }
@@ -79,64 +79,44 @@ export default class TodoRow extends React.Component {
     return `${month}/${day}/${year}`;
   };
 
-  // <TouchableOpacity onPress={() => (todo.editing = true)}>
-
-  // </TouchableOpacity>
-
   render() {
-    let { todo, index, drag, isActive } = this.props;
+    let { todo, index, drag, isActive, removeTodo } = this.props;
     return (
       <Swipeout
         autoClose
         right={[
           {
             text: <FontAwesome name="edit" size={24} color={"white"} />,
-            backgroundColor: "blue",
+            backgroundColor: "#71935c",
             onPress: (e) => todo.updateProp("editing", true),
           },
           {
             text: <FontAwesome name="trash" size={24} color={"white"} />,
-            backgroundColor: "blue",
-            onPress: (e) => todo.updateProp("removed", true),
+            backgroundColor: "#71935c",
+            onPress: (e) => removeTodo(todo),
           },
         ]}
-        backgroundColor={"blue"}
+        backgroundColor={"#89b4ad"}
       >
         <ListItem
           key={index}
-          style={[
-            // styles.container,
-            {
-              backgroundColor: isActive ? "blue" : todo.backgroundColor,
-            },
-          ]}
+          // onLongPress={() => todo.updateProp("editing", true)}
           title={
             <View style={{ height: 52, justifyContent: "center" }}>
               {todo.editing ? (
                 <TextInput
-                  style={{
-                    // borderColor: "gray",
-                    // borderWidth: 1,
-                    paddingVertical: 0,
-                    paddingHorizontal: 0,
-                    paddingTop: 0,
-                  }}
+                  style={styles.textInput}
                   onChangeText={(text) => this.onChangeText(text)}
                   value={todo.label}
-                  onBlur={() => (todo.editing = false)}
+                  onBlur={() => todo.updateProp("editing", false)}
                   autoFocus
-                  multiline
-                  numberOfLines={3}
+                  // multiline
+                  // numberOfLines={3}
                 />
               ) : (
-                <DoubleClick
-                  doubleTap={() => (todo.editing = true)}
-                  delay={200}
-                >
-                  <Text numberOfLines={3} ellipsizeMode="tail">
-                    {todo.label}
-                  </Text>
-                </DoubleClick>
+                <Text numberOfLines={3} ellipsizeMode="tail">
+                  {todo.label}
+                </Text>
               )}
             </View>
           }
@@ -164,7 +144,7 @@ export default class TodoRow extends React.Component {
                     prefill={todo.fill}
                     rotation={0}
                     ref={(ref) => (this.circularProgress = ref)}
-                    tintColor="blue"
+                    tintColor="#89b4ad"
                     onAnimationComplete={this.complete}
                     backgroundColor="#fff"
                   />
@@ -177,15 +157,25 @@ export default class TodoRow extends React.Component {
                     },
                   ]}
                 >
-                  <FontAwesome name="circle" size={36} color={"blue"} />
+                  <FontAwesome name="circle" size={36} color={"#89b4ad"} />
                 </View>
               </View>
             </TouchableOpacity>
           }
           rightAvatar={
-            <TouchableOpacity onLongPress={drag} delayLongPress={0}>
-              <Feather name="list" size={24} color={"blue"} />
+            // <DoubleClick
+            //   doubleTap={() => todo.updateProp("editing", true)}
+            //   delay={200}
+            // >
+            <TouchableOpacity
+              onPress={() => todo.updateProp("editing", true)}
+              onLongPress={drag}
+              delayLongPress={100}
+              style={styles.drag}
+            >
+              <Feather name="list" size={24} color={"lightgray"} />
             </TouchableOpacity>
+            // </DoubleClick>
           }
           bottomDivider
         />
@@ -208,5 +198,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 36,
     width: 36,
+  },
+  textInput: {
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    paddingTop: 0,
+  },
+  drag: {
+    width: 48,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

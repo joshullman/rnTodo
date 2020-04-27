@@ -1,12 +1,36 @@
 import React from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
-import { Button, Text } from "react-native-elements";
+import { Button, Text, ThemeProvider } from "react-native-elements";
+import KeyboardShift from "./KeyboardShift";
 
 import { observable, computed } from "mobx";
 import { observer } from "mobx-react";
 
 import DraggableFlatList from "react-native-draggable-flatlist";
+import { FontAwesome } from "@expo/vector-icons";
+import * as Crypto from "expo-crypto";
+
 import TodoRow, { Todo } from "./Todo";
+
+const theme = {
+  Button: {
+    buttonStyle: {
+      borderRadius: 0,
+      // backgroundColor: "#C6AEFF",
+    },
+  },
+};
+
+let id = 0;
+
+// function uuidv4() {
+//   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+//     (
+//       c ^
+//       (Crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+//     ).toString(16)
+//   );
+// }
 
 class TodoList {
   @observable complete = [];
@@ -19,14 +43,15 @@ class TodoList {
   };
 
   init = () => {
-    [...Array(7)].forEach((d, index) =>
+    [...Array(7)].forEach((d, index) => {
       this.incomplete.push(
         new Todo({
-          id: `item-${index}`, // For example only
+          id,
           label: `${index}`,
         })
-      )
-    );
+      );
+      id++;
+    });
   };
 
   toggleComplete = (todo) => {
@@ -46,11 +71,25 @@ class TodoList {
     }
   };
 
+  newTodo = () => {
+    this.incomplete.push(
+      new Todo({
+        id,
+        label: "",
+      })
+    );
+    id++;
+  };
+
   removeTodo = (todo) => {
+    todo.removed = Date.now();
+    this.removed.push(todo);
     if (this.viewing == "complete") {
-      this.removed.push(todo);
+      let i = this.complete.indexOf(todo);
+      this.complete.splice(i, 1);
     } else {
-      this.removed.push(todo);
+      let i = this.incomplete.indexOf(todo);
+      this.incomplete.splice(i, 1);
     }
   };
 }
@@ -77,45 +116,87 @@ export default class App extends React.Component {
   };
 
   render() {
-    let { viewing, complete, incomplete } = this.state;
-    let todos = viewing == "complete" ? complete : incomplete;
+    let { viewing, newTodo } = this.state;
+    let todos = this.state[viewing];
     return (
-      <View style={styles.container}>
-        <View style={styles.header}></View>
-        <View style={styles.body}>
-          <View style={styles.buttonRow}>
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Pending"
-                type={viewing == "incomplete" ? "solid" : "clear"}
-                onPress={() => this.state.nowViewing("incomplete")}
-              />
+      <ThemeProvider theme={theme}>
+        <View style={styles.container}>
+          <View style={styles.headerPadding} />
+          <View style={styles.header}>
+            <Text h3 style={styles.headerText}>
+              Todos
+            </Text>
+            <TouchableOpacity style={styles.newTodo} onPress={newTodo}>
+              <FontAwesome name="plus-circle" size={32} color={"white"} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.body}>
+            <View style={styles.buttonRow}>
+              <View style={styles.buttonContainer}>
+                <Button
+                  buttonStyle={[
+                    styles.button,
+                    viewing == "incomplete"
+                      ? styles.raisedButton
+                      : styles.clearButton,
+                  ]}
+                  titleStyle={
+                    viewing == "incomplete"
+                      ? styles.raisedTitle
+                      : styles.clearTitle
+                  }
+                  title="Pending"
+                  onPress={() => this.state.nowViewing("incomplete")}
+                />
+              </View>
+              <View style={styles.buttonContainer}>
+                <Button
+                  buttonStyle={[
+                    styles.button,
+                    viewing == "complete"
+                      ? styles.raisedButton
+                      : styles.clearButton,
+                  ]}
+                  titleStyle={
+                    viewing == "complete"
+                      ? styles.raisedTitle
+                      : styles.clearTitle
+                  }
+                  title="Complete"
+                  onPress={() => this.state.nowViewing("complete")}
+                />
+              </View>
             </View>
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Complete"
-                type={viewing == "complete" ? "solid" : "clear"}
-                onPress={() => this.state.nowViewing("complete")}
-              />
+            {todos.length === 0 && (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ padding: 10 }}>
+                  {viewing == "complete"
+                    ? "Completed todos appear here"
+                    : "Create a todo by clicking the plus sign"}
+                </Text>
+              </View>
+            )}
+            <View style={{ flex: 1 }}>
+              <KeyboardShift>
+                {() => (
+                  <DraggableFlatList
+                    data={todos}
+                    renderItem={this.renderItem}
+                    keyExtractor={(item, index) => `draggable-item-${item.id}`}
+                    onDragEnd={({ data }) => (this.state[viewing] = data)}
+                  />
+                )}
+              </KeyboardShift>
             </View>
           </View>
-          {todos.length === 0 && (
-            <View>
-              <Text style={{ padding: 10 }}>
-                {viewing == "complete"
-                  ? "Complete a todo to see it here!"
-                  : "Create a todo by clicking the plus sign"}
-              </Text>
-            </View>
-          )}
-          <DraggableFlatList
-            data={this.state[viewing]}
-            renderItem={this.renderItem}
-            keyExtractor={(item, index) => `draggable-item-${item.id}`}
-            onDragEnd={({ data }) => (this.state[viewing] = data)}
-          />
         </View>
-      </View>
+      </ThemeProvider>
     );
   }
 }
@@ -126,9 +207,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     flexDirection: "column",
   },
+  headerPadding: {
+    height: 30,
+    backgroundColor: "#4e7934",
+  },
   header: {
-    height: 100,
-    backgroundColor: "red",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: 70,
+    backgroundColor: "#4e7934",
+    color: "white",
+    padding: 10,
+  },
+  headerText: {
     color: "white",
   },
   body: {
@@ -139,5 +231,28 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
+    // borderBottomColor: "lightgray",
+    // borderBottomWidth: 1,
+  },
+  button: {
+    borderRadius: 0,
+  },
+  newTodo: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100%",
+    width: 48,
+  },
+  raisedButton: {
+    backgroundColor: "#89b4ad",
+  },
+  raisedTitle: {
+    color: "white",
+  },
+  clearButton: {
+    backgroundColor: "white",
+  },
+  clearTitle: {
+    color: "#89b4ad",
   },
 });
