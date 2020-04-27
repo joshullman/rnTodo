@@ -7,7 +7,7 @@ import { observable, computed } from "mobx";
 import { observer } from "mobx-react";
 
 import DraggableFlatList from "react-native-draggable-flatlist";
-import { FontAwesome } from "@expo/vector-icons";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 import * as Crypto from "expo-crypto";
 
 import TodoRow, { Todo } from "./Todo";
@@ -16,12 +16,9 @@ const theme = {
   Button: {
     buttonStyle: {
       borderRadius: 0,
-      // backgroundColor: "#C6AEFF",
     },
   },
 };
-
-let id = 0;
 
 // function uuidv4() {
 //   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
@@ -42,18 +39,6 @@ class TodoList {
     this.viewing = page;
   };
 
-  init = () => {
-    [...Array(7)].forEach((d, index) => {
-      this.incomplete.push(
-        new Todo({
-          id,
-          label: `${index}`,
-        })
-      );
-      id++;
-    });
-  };
-
   toggleComplete = (todo) => {
     todo.inProgress = false;
     if (todo.completed) {
@@ -72,13 +57,7 @@ class TodoList {
   };
 
   newTodo = () => {
-    this.incomplete.push(
-      new Todo({
-        id,
-        label: "",
-      })
-    );
-    id++;
+    this.incomplete.push(new Todo());
   };
 
   removeTodo = (todo) => {
@@ -98,7 +77,6 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = new TodoList();
-    this.state.init();
   }
 
   renderItem = ({ item, index, drag, isActive }) => {
@@ -175,11 +153,39 @@ export default class App extends React.Component {
                   alignItems: "center",
                 }}
               >
-                <Text style={{ padding: 10 }}>
-                  {viewing == "complete"
-                    ? "Completed todos appear here"
-                    : "Create a todo by clicking the plus sign"}
-                </Text>
+                {viewing == "complete" ? (
+                  <Text style={{ padding: 10 }}>
+                    Completed todos appear here
+                  </Text>
+                ) : (
+                  <View>
+                    <View style={styles.tutorialRow}>
+                      <Text>Tap</Text>
+                      <View style={styles.tutorialIcon}>
+                        <FontAwesome
+                          name="plus-circle"
+                          size={12}
+                          color={"black"}
+                        />
+                      </View>
+                      <Text>to create a new todo</Text>
+                    </View>
+                    <View style={styles.tutorialRow}>
+                      <Text>Tap</Text>
+                      <View style={styles.tutorialIcon}>
+                        <Feather name="list" size={12} color={"black"} />
+                      </View>
+                      <Text>or swipe left to edit</Text>
+                    </View>
+                    <View style={styles.tutorialRow}>
+                      <Text>Hold</Text>
+                      <View style={styles.tutorialIcon}>
+                        <Feather name="list" size={12} color={"black"} />
+                      </View>
+                      <Text>to rearrange</Text>
+                    </View>
+                  </View>
+                )}
               </View>
             )}
             <View style={{ flex: 1 }}>
@@ -254,5 +260,17 @@ const styles = StyleSheet.create({
   },
   clearTitle: {
     color: "#89b4ad",
+  },
+  tutorialRow: {
+    padding: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    // height: 18,
+  },
+  tutorialIcon: {
+    // height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 5,
   },
 });

@@ -18,11 +18,13 @@ import { AnimatedCircularProgress } from "react-native-circular-progress";
 
 import { Feather, FontAwesome } from "@expo/vector-icons";
 
+// purely for example purposes
+let id = 0;
+
 export class Todo {
-  constructor({ id, label, backgroundColor }) {
+  constructor() {
     this.id = id;
-    this.label = label;
-    this.backgroundColor = backgroundColor;
+    id++;
     this.created = Date.now();
   }
   id;
@@ -31,7 +33,7 @@ export class Todo {
   @observable inProgress = false;
   created;
   @observable completed;
-  @observable editing = false;
+  @observable editing = true;
   @observable removed;
 
   updateProp = (prop, val) => {
