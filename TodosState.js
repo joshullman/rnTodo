@@ -1,4 +1,4 @@
-import { observable, computed } from "mobx";
+import { observable, computed, action } from "mobx";
 
 class State {
   @observable complete = [];
@@ -27,7 +27,7 @@ class State {
     }
   };
 
-  newTodo = () => {
+  @action newTodo = () => {
     this.incomplete.push(new Todo());
   };
 

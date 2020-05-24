@@ -8,10 +8,10 @@ import { createSwitchNavigator, createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 
-import { observable, computed } from "mobx";
+import TodosState from "./TodosState";
 import { observer } from "mobx-react";
 
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, Feather } from "@expo/vector-icons";
 
 import PendingScreen from "./PendingScreen";
 import CompletedScreen from "./CompletedScreen";
@@ -45,6 +45,19 @@ let Screens = {
     screen: PendingScreen,
     navigationOptions: ({ navigation }) => ({
       title: "Pending",
+      headerRight: () => (
+        <TouchableOpacity
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            width: 48,
+          }}
+          onPress={TodosState.newTodo}
+        >
+          <FontAwesome name={"plus-circle"} size={24} />
+        </TouchableOpacity>
+      ),
     }),
   },
   Completed: {
@@ -83,7 +96,7 @@ const AppNavigator = createBottomTabNavigator(
       screen: PendingStack,
       navigationOptions: {
         tabBarIcon: ({ focused, tintColor }) => (
-          <FontAwesome name={"users"} size={24} color={tintColor} />
+          <Feather name="list" size={24} color={tintColor} />
         ),
       },
     },
@@ -91,7 +104,7 @@ const AppNavigator = createBottomTabNavigator(
       screen: CompletedStack,
       navigationOptions: {
         tabBarIcon: ({ focused, tintColor }) => (
-          <FontAwesome name={"user-circle"} size={24} color={tintColor} />
+          <FontAwesome name={"check-circle"} size={24} color={tintColor} />
         ),
       },
     },
@@ -99,13 +112,13 @@ const AppNavigator = createBottomTabNavigator(
   {
     initialRouteName: "Pending",
     tabBarOptions: {
-      activeTintColor: "orange",
+      activeTintColor: "blue",
       // activeBackgroundColor: Theme.primary[300],
       // inactiveTintColor: "black",
-      inactiveTintColor: "blue",
+      inactiveTintColor: "gray",
       // inactiveBackgroundColor: Theme.primary[300]
       style: {
-        backgroundColor: "red",
+        // backgroundColor: "red",
         paddingTop: 10,
       },
     },
@@ -131,73 +144,6 @@ const AppContainer = createAppContainer(switchNavigator);
 //     ).toString(16)
 //   );
 // }
-
-class State {
-  @observable complete = [];
-  @observable incomplete = [];
-  @observable removed = [];
-  @observable viewing = "incomplete";
-
-  nowViewing = (page) => {
-    this.viewing = page;
-  };
-
-  toggleComplete = (todo) => {
-    todo.inProgress = false;
-    if (todo.completed) {
-      todo.completed = null;
-      todo.fill = 0;
-      this.incomplete.push(todo);
-      let i = this.complete.indexOf(todo);
-      this.complete.splice(i, 1);
-    } else {
-      todo.completed = Date.now();
-      todo.fill = 100;
-      this.complete.push(todo);
-      let i = this.incomplete.indexOf(todo);
-      this.incomplete.splice(i, 1);
-    }
-  };
-
-  newTodo = () => {
-    this.incomplete.push(new Todo());
-  };
-
-  removeTodo = (todo) => {
-    todo.removed = Date.now();
-    this.removed.push(todo);
-    if (this.viewing == "complete") {
-      let i = this.complete.indexOf(todo);
-      this.complete.splice(i, 1);
-    } else {
-      let i = this.incomplete.indexOf(todo);
-      this.incomplete.splice(i, 1);
-    }
-  };
-}
-
-// purely for example purposes
-let id = 0;
-
-export class Todo {
-  constructor() {
-    this.id = id;
-    id++;
-    this.created = Date.now();
-  }
-  id;
-  @observable label = "";
-  @observable fill = 0;
-  @observable inProgress = false;
-  created;
-  @observable completed;
-  @observable editing = true;
-  @observable removed;
-
-  updateProp = (prop, val) => {
-    this[prop] = val;
-  };
-}
 
 @observer
 export default class App extends React.Component {
