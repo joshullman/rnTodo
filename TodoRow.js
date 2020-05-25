@@ -10,6 +10,8 @@ import {
   View,
 } from "react-native";
 
+import TodosState from "./TodosState";
+
 import { ListItem, Text } from "react-native-elements";
 import Swipeout from "react-native-swipeout";
 import DoubleClick from "react-native-double-tap";
@@ -45,17 +47,19 @@ export default class TodoRow extends React.Component {
     }
   };
 
-  onChangeText = (text) => {
-    let { todo } = this.props;
-    todo.label = text;
-  };
-
   formatDate = (timestamp) => {
     let date = new Date(timestamp);
     let month = date.getMonth() + 1;
     let day = date.getDate();
     let year = date.getFullYear();
     return `${month}/${day}/${year}`;
+  };
+
+  openTodo = () => {
+    let { todo, navigation } = this.props;
+    if (navigation) {
+      navigation.navigate("Todo", { todo });
+    }
   };
 
   render() {
@@ -67,36 +71,24 @@ export default class TodoRow extends React.Component {
           {
             text: <FontAwesome name="edit" size={24} color={"white"} />,
             backgroundColor: "#71935c",
-            onPress: (e) => todo.updateProp("editing", true),
+            onPress: this.openTodo,
           },
           {
             text: <FontAwesome name="trash" size={24} color={"white"} />,
             backgroundColor: "#71935c",
-            onPress: (e) => removeTodo(todo),
+            onPress: (e) => TodosState.removeTodo(todo),
           },
         ]}
         backgroundColor={"#89b4ad"}
       >
         <ListItem
           key={index}
-          // onLongPress={() => todo.updateProp("editing", true)}
+          // onPress={() => todo.}
           title={
             <View style={{ height: 52, justifyContent: "center" }}>
-              {todo.editing ? (
-                <TextInput
-                  style={styles.textInput}
-                  onChangeText={(text) => this.onChangeText(text)}
-                  value={todo.label}
-                  onBlur={() => todo.updateProp("editing", false)}
-                  autoFocus
-                  // multiline
-                  // numberOfLines={3}
-                />
-              ) : (
-                <Text numberOfLines={3} ellipsizeMode="tail">
-                  {todo.label}
-                </Text>
-              )}
+              <Text numberOfLines={3} ellipsizeMode="tail">
+                {todo.label}
+              </Text>
             </View>
           }
           // subtitle={
@@ -142,19 +134,14 @@ export default class TodoRow extends React.Component {
             </TouchableOpacity>
           }
           rightAvatar={
-            // <DoubleClick
-            //   doubleTap={() => todo.updateProp("editing", true)}
-            //   delay={200}
-            // >
             <TouchableOpacity
-              onPress={() => todo.updateProp("editing", true)}
+              // onPress={() => todo.updateProp("editing", true)}
               onLongPress={drag}
-              delayLongPress={100}
+              delayLongPress={0}
               style={styles.drag}
             >
               <Feather name="list" size={24} color={"lightgray"} />
             </TouchableOpacity>
-            // </DoubleClick>
           }
           bottomDivider
         />

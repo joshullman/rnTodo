@@ -48,18 +48,16 @@ export default class CompletedScreen extends React.Component {
             </View>
           )}
           <View style={{ flex: 1 }}>
-            <KeyboardShift>
-              {() => (
-                <DraggableFlatList
-                  data={todos}
-                  renderItem={this.renderItem}
-                  keyExtractor={(item, index) => `draggable-item-${item.id}`}
-                  onDragEnd={({ data }) =>
-                    (TodosState[TodosState.viewing] = data)
-                  }
-                />
-              )}
-            </KeyboardShift>
+            {/* <KeyboardShift>
+              {() => ( */}
+            <DraggableFlatList
+              data={todos}
+              renderItem={this.renderItem}
+              keyExtractor={(item, index) => `draggable-item-${item.id}`}
+              onDragEnd={({ data }) => (TodosState.complete = data)}
+            />
+            {/* )}
+            </KeyboardShift> */}
           </View>
         </View>
       </View>

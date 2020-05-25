@@ -1,8 +1,7 @@
 import React from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { Button, Text, ThemeProvider } from "react-native-elements";
-import KeyboardShift from "./KeyboardShift";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { createSwitchNavigator, createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
@@ -53,7 +52,7 @@ let Screens = {
             height: "100%",
             width: 48,
           }}
-          onPress={TodosState.newTodo}
+          onPress={() => TodosState.newTodo(navigation)}
         >
           <FontAwesome name={"plus-circle"} size={24} />
         </TouchableOpacity>
@@ -70,6 +69,25 @@ let Screens = {
     screen: TodoScreen,
     navigationOptions: ({ navigation }) => ({
       title: "Todo",
+      headerRight: () => {
+        let todo = navigation.getParam("todo", {});
+        return (
+          <TouchableOpacity
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+              width: 48,
+            }}
+            onPress={() => {
+              TodosState.removeTodo(todo);
+              navigation.pop();
+            }}
+          >
+            <FontAwesome name={"trash"} size={24} />
+          </TouchableOpacity>
+        );
+      },
     }),
   },
 };

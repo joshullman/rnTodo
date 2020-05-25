@@ -27,8 +27,12 @@ class State {
     }
   };
 
-  @action newTodo = () => {
-    this.incomplete.push(new Todo());
+  newTodo = (navigation) => {
+    let todo = new Todo();
+    this.incomplete.push(todo);
+    if (navigation) {
+      navigation.navigate("Todo", { todo });
+    }
   };
 
   removeTodo = (todo) => {
@@ -54,11 +58,13 @@ class Todo {
   }
   id;
   @observable label = "";
+  @observable description = "";
+  @observable targetDate = null;
   @observable fill = 0;
   @observable inProgress = false;
   created;
   @observable completed;
-  @observable editing = true;
+  // @observable editing = true;
   @observable removed;
 
   updateProp = (prop, val) => {
