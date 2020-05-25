@@ -25,8 +25,7 @@ export default class CompletedScreen extends React.Component {
         index={index}
         drag={drag}
         isActive={isActive}
-        toggleComplete={this.state.toggleComplete}
-        removeTodo={this.state.removeTodo}
+        navigation={this.props.navigation}
       />
     );
   };

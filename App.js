@@ -22,6 +22,11 @@ const theme = {
       borderRadius: 0,
     },
   },
+  ListItem: {
+    // subtitleStyle: {
+    //   color: "gray",
+    // },
+  },
 };
 
 let headerStyle = {
@@ -130,7 +135,7 @@ const AppNavigator = createBottomTabNavigator(
   {
     initialRouteName: "Pending",
     tabBarOptions: {
-      activeTintColor: "blue",
+      activeTintColor: "#89b4ad",
       // activeBackgroundColor: Theme.primary[300],
       // inactiveTintColor: "black",
       inactiveTintColor: "gray",

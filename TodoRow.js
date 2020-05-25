@@ -20,6 +20,8 @@ import { AnimatedCircularProgress } from "react-native-circular-progress";
 
 import { Feather, FontAwesome } from "@expo/vector-icons";
 
+const ONE_DAY_MILLI = 86400000;
+
 @observer
 export default class TodoRow extends React.Component {
   startAnimation = () => {
@@ -41,9 +43,9 @@ export default class TodoRow extends React.Component {
   };
 
   complete = () => {
-    let { todo, toggleComplete, index } = this.props;
+    let { todo, index } = this.props;
     if (todo.inProgress) {
-      toggleComplete(todo, index);
+      TodosState.toggleComplete(todo, index);
     }
   };
 
@@ -65,87 +67,101 @@ export default class TodoRow extends React.Component {
   render() {
     let { todo, index, drag, isActive, removeTodo } = this.props;
     return (
-      <Swipeout
-        autoClose
-        right={[
-          {
-            text: <FontAwesome name="edit" size={24} color={"white"} />,
-            backgroundColor: "#71935c",
-            onPress: this.openTodo,
-          },
-          {
-            text: <FontAwesome name="trash" size={24} color={"white"} />,
-            backgroundColor: "#71935c",
-            onPress: (e) => TodosState.removeTodo(todo),
-          },
-        ]}
-        backgroundColor={"#89b4ad"}
-      >
-        <ListItem
-          key={index}
-          // onPress={() => todo.}
-          title={
-            <View style={{ height: 52, justifyContent: "center" }}>
-              <Text numberOfLines={3} ellipsizeMode="tail">
-                {todo.label}
-              </Text>
-            </View>
-          }
-          // subtitle={
-          //   todo.completed
-          //     ? `Completed ${this.formatDate(todo.completed)}`
-          //     : `Created ${this.formatDate(todo.created)}`
-          // }
-          leftAvatar={
-            <TouchableOpacity onPress={this.startAnimation}>
-              <View style={{ position: "relative", height: 36, width: 36 }}>
-                <View
-                  style={[
-                    styles.icon,
-                    {
-                      zIndex: 2,
-                    },
-                  ]}
-                >
-                  <AnimatedCircularProgress
-                    // onPress={this.complete}
-                    size={24}
-                    width={12}
-                    fill={todo.fill}
-                    prefill={todo.fill}
-                    rotation={0}
-                    ref={(ref) => (this.circularProgress = ref)}
-                    tintColor="#89b4ad"
-                    onAnimationComplete={this.complete}
-                    backgroundColor="#fff"
-                  />
-                </View>
-                <View
-                  style={[
-                    styles.icon,
-                    {
-                      zIndex: 1,
-                    },
-                  ]}
-                >
-                  <FontAwesome name="circle" size={36} color={"#89b4ad"} />
-                </View>
+      // <Swipeout
+      //   autoClose
+      //   right={[
+      //     {
+      //       text: <FontAwesome name="edit" size={24} color={"white"} />,
+      //       backgroundColor: "#89b4ad",
+      //       onPress: this.openTodo,
+      //     },
+      //     {
+      //       text: <FontAwesome name="trash" size={24} color={"white"} />,
+      //       backgroundColor: "#89b4ad",
+      //       onPress: (e) => TodosState.removeTodo(todo),
+      //     },
+      //   ]}
+      //   backgroundColor={"#89b4ad"}
+      // >
+      <ListItem
+        key={index}
+        onPress={this.openTodo}
+        title={
+          <View style={{ height: 52, justifyContent: "center" }}>
+            <Text numberOfLines={3} ellipsizeMode="tail">
+              {todo.label}
+            </Text>
+          </View>
+        }
+        subtitle={
+          todo.completed
+            ? `Completed on ${this.formatDate(todo.completed)}`
+            : todo.completeByDate &&
+              todo.created != todo.completeBy.getTime() &&
+              `Complete by ${this.formatDate(todo.completeBy.getTime())}`
+        }
+        subtitleStyle={{
+          color:
+            !todo.completed &&
+            todo.completeByDate &&
+            todo.created != todo.completeBy.getTime()
+              ? Date.now() > todo.completeBy.getTime()
+                ? "red"
+                : todo.completeBy.getTime() - Date.now() < ONE_DAY_MILLI * 3
+                ? "orange"
+                : "gray"
+              : "gray",
+        }}
+        leftAvatar={
+          <TouchableOpacity onPress={this.startAnimation}>
+            <View style={{ position: "relative", height: 36, width: 36 }}>
+              <View
+                style={[
+                  styles.icon,
+                  {
+                    zIndex: 2,
+                  },
+                ]}
+              >
+                <AnimatedCircularProgress
+                  // onPress={this.complete}
+                  size={24}
+                  width={12}
+                  fill={todo.fill}
+                  prefill={todo.fill}
+                  rotation={0}
+                  ref={(ref) => (this.circularProgress = ref)}
+                  tintColor="#89b4ad"
+                  onAnimationComplete={this.complete}
+                  backgroundColor="#fff"
+                />
               </View>
-            </TouchableOpacity>
-          }
-          rightAvatar={
-            <TouchableOpacity
-              // onPress={() => todo.updateProp("editing", true)}
-              onLongPress={drag}
-              delayLongPress={0}
-              style={styles.drag}
-            >
-              <Feather name="list" size={24} color={"lightgray"} />
-            </TouchableOpacity>
-          }
-          bottomDivider
-        />
-      </Swipeout>
+              <View
+                style={[
+                  styles.icon,
+                  {
+                    zIndex: 1,
+                  },
+                ]}
+              >
+                <FontAwesome name="circle" size={36} color={"#89b4ad"} />
+              </View>
+            </View>
+          </TouchableOpacity>
+        }
+        rightAvatar={
+          <TouchableOpacity
+            // onPress={() => todo.updateProp("editing", true)}
+            onLongPress={drag}
+            delayLongPress={0}
+            style={styles.drag}
+          >
+            <Feather name="list" size={24} color={"lightgray"} />
+          </TouchableOpacity>
+        }
+        bottomDivider
+      />
+      // </Swipeout>
     );
   }
 }

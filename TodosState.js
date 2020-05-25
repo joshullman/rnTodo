@@ -29,9 +29,9 @@ class State {
 
   newTodo = (navigation) => {
     let todo = new Todo();
-    this.incomplete.push(todo);
     if (navigation) {
       navigation.navigate("Todo", { todo });
+      this.incomplete.push(todo);
     }
   };
 
@@ -54,12 +54,15 @@ let id = 0;
 class Todo {
   constructor() {
     this.id = id++;
-    this.created = Date.now();
+    let date = Date.now();
+    this.completeBy = new Date(date);
+    this.created = date;
   }
   id;
   @observable label = "";
   @observable description = "";
-  @observable targetDate = null;
+  @observable completeByDate = false;
+  @observable completeBy = null;
   @observable fill = 0;
   @observable inProgress = false;
   created;

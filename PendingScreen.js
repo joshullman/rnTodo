@@ -26,8 +26,7 @@ export default class PendingScreen extends React.Component {
         index={index}
         drag={drag}
         isActive={isActive}
-        toggleComplete={this.state.toggleComplete}
-        removeTodo={this.state.removeTodo}
+        navigation={this.props.navigation}
       />
     );
   };
@@ -54,18 +53,14 @@ export default class PendingScreen extends React.Component {
                   <Text>to create a new todo</Text>
                 </View>
                 <View style={styles.tutorialRow}>
-                  <Text>Tap</Text>
-                  <View style={styles.tutorialIcon}>
-                    <Feather name="list" size={12} color={"black"} />
-                  </View>
-                  <Text>or swipe left to edit</Text>
-                </View>
-                <View style={styles.tutorialRow}>
                   <Text>Hold</Text>
                   <View style={styles.tutorialIcon}>
                     <Feather name="list" size={12} color={"black"} />
                   </View>
                   <Text>to rearrange</Text>
+                </View>
+                <View style={styles.tutorialRow}>
+                  <Text>Tap a row to edit</Text>
                 </View>
               </View>
             </View>
