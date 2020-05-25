@@ -7,14 +7,14 @@ import { createSwitchNavigator, createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 
-import TodosState from "./TodosState";
+import TodosState from "./state/TodosState";
 import { observer } from "mobx-react";
 
 import { FontAwesome, Feather } from "@expo/vector-icons";
 
-import PendingScreen from "./PendingScreen";
-import CompletedScreen from "./CompletedScreen";
-import TodoScreen from "./TodoScreen";
+import PendingScreen from "./screens/PendingScreen";
+import CompletedScreen from "./screens/CompletedScreen";
+import TodoScreen from "./screens/TodoScreen";
 
 const theme = {
   Button: {

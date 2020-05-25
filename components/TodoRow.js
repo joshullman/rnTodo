@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 
-import TodosState from "./TodosState";
+import TodosState from "../state/TodosState";
 
 import { ListItem, Text } from "react-native-elements";
 import Swipeout from "react-native-swipeout";
@@ -67,22 +67,6 @@ export default class TodoRow extends React.Component {
   render() {
     let { todo, index, drag, isActive, removeTodo } = this.props;
     return (
-      // <Swipeout
-      //   autoClose
-      //   right={[
-      //     {
-      //       text: <FontAwesome name="edit" size={24} color={"white"} />,
-      //       backgroundColor: "#89b4ad",
-      //       onPress: this.openTodo,
-      //     },
-      //     {
-      //       text: <FontAwesome name="trash" size={24} color={"white"} />,
-      //       backgroundColor: "#89b4ad",
-      //       onPress: (e) => TodosState.removeTodo(todo),
-      //     },
-      //   ]}
-      //   backgroundColor={"#89b4ad"}
-      // >
       <ListItem
         key={index}
         onPress={this.openTodo}
@@ -96,9 +80,9 @@ export default class TodoRow extends React.Component {
         subtitle={
           todo.completed
             ? `Completed on ${this.formatDate(todo.completed)}`
-            : todo.completeByDate &&
-              todo.created != todo.completeBy.getTime() &&
-              `Complete by ${this.formatDate(todo.completeBy.getTime())}`
+            : todo.completeByDate && todo.created != todo.completeBy.getTime()
+            ? `Complete by ${this.formatDate(todo.completeBy.getTime())}`
+            : ""
         }
         subtitleStyle={{
           color:
@@ -151,7 +135,6 @@ export default class TodoRow extends React.Component {
         }
         rightAvatar={
           <TouchableOpacity
-            // onPress={() => todo.updateProp("editing", true)}
             onLongPress={drag}
             delayLongPress={0}
             style={styles.drag}
@@ -161,7 +144,6 @@ export default class TodoRow extends React.Component {
         }
         bottomDivider
       />
-      // </Swipeout>
     );
   }
 }

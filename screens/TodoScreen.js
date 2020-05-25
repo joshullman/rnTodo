@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Text } from "react-native-elements";
 import { observable, computed } from "mobx";
-import TodosState from "./TodosState";
+import TodosState from "../state/TodosState";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { observer } from "mobx-react";

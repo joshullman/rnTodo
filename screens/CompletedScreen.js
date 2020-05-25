@@ -1,19 +1,18 @@
 import React from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { Button, Text, ThemeProvider } from "react-native-elements";
-import KeyboardShift from "./KeyboardShift";
+import KeyboardShift from "../components/KeyboardShift";
+
 import DraggableFlatList from "react-native-draggable-flatlist";
 
-import TodoRow from "./TodoRow";
+import TodoRow from "../components/TodoRow";
 
-import TodosState from "./TodosState";
+import TodosState from "../state/TodosState";
 
 import { observer } from "mobx-react";
 
-import { FontAwesome, Feather } from "@expo/vector-icons";
-
 @observer
-export default class PendingScreen extends React.Component {
+export default class CompletedScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = TodosState;
@@ -32,7 +31,7 @@ export default class PendingScreen extends React.Component {
   };
 
   render() {
-    let todos = this.state.incomplete;
+    let todos = this.state.complete;
     return (
       <View style={styles.container}>
         <View style={styles.body}>
@@ -44,25 +43,7 @@ export default class PendingScreen extends React.Component {
                 alignItems: "center",
               }}
             >
-              <View>
-                <View style={styles.tutorialRow}>
-                  <Text>Tap</Text>
-                  <View style={styles.tutorialIcon}>
-                    <FontAwesome name="plus-circle" size={12} color={"black"} />
-                  </View>
-                  <Text>to create a new todo</Text>
-                </View>
-                <View style={styles.tutorialRow}>
-                  <Text>Hold</Text>
-                  <View style={styles.tutorialIcon}>
-                    <Feather name="list" size={12} color={"black"} />
-                  </View>
-                  <Text>to rearrange</Text>
-                </View>
-                <View style={styles.tutorialRow}>
-                  <Text>Tap a row to edit</Text>
-                </View>
-              </View>
+              <Text style={{ padding: 10 }}>Completed todos appear here</Text>
             </View>
           )}
           <View style={{ flex: 1 }}>
@@ -72,7 +53,7 @@ export default class PendingScreen extends React.Component {
               data={todos}
               renderItem={this.renderItem}
               keyExtractor={(item, index) => `draggable-item-${item.id}`}
-              onDragEnd={({ data }) => (TodosState.incomplete = data)}
+              onDragEnd={({ data }) => (TodosState.complete = data)}
             />
             {/* )}
             </KeyboardShift> */}
@@ -86,8 +67,6 @@ export default class PendingScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // width: "100%",
-    // height: "100%",
     backgroundColor: "#fff",
     flexDirection: "column",
   },
@@ -111,17 +90,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: "100%",
     width: 48,
-  },
-  tutorialRow: {
-    padding: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    // height: 18,
-  },
-  tutorialIcon: {
-    // height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 5,
   },
 });
